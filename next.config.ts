@@ -2,7 +2,8 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  output: 'export', // Add this line for static HTML export
+  // output: 'export', // This will be set by actions/configure-pages@v5 in CI
+  // basePath: '/my-website', // This will be set by actions/configure-pages@v5 in CI
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -10,7 +11,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    unoptimized: true, // Required for static export with next/image
+    // unoptimized: true, // This will be set by actions/configure-pages@v5 in CI
     remotePatterns: [
       {
         protocol: 'https',
