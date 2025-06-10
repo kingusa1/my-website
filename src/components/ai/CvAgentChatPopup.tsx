@@ -12,7 +12,7 @@ import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, MessageSquare, Send, User, Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { askCvGeneralAgent, type AskCvGeneralAgentInput, type AskCvGeneralAgentOutput } from '@/ai/flows/ask-cv-general-flow';
+// Removed: import { askCvGeneralAgent, type AskCvGeneralAgentInput, type AskCvGeneralAgentOutput } from '@/ai/flows/ask-cv-general-flow';
 
 
 const chatFormSchema = z.object({
@@ -111,10 +111,9 @@ export function CvAgentChatPopup({ open, onOpenChange }: CvAgentChatPopupProps) 
     
     const isHeaderOrTitle = targetElement === headerElement || (titleElement && titleElement.contains(targetElement));
     
-    // Check if the click is on an interactive element within the header, but not the header/title itself
     const isInteractiveWithinHeader = targetElement.closest('button, textarea, a, input, select');
     if (isInteractiveWithinHeader && targetElement !== titleElement && targetElement !== headerElement && headerElement.contains(isInteractiveWithinHeader)) {
-      return; // Do not start drag if clicking an interactive element (like a close button inside header)
+      return; 
     }
 
     if (!isHeaderOrTitle || targetElement.closest('button:not([aria-label="Close"]), textarea, input, select')) return;
@@ -141,13 +140,11 @@ export function CvAgentChatPopup({ open, onOpenChange }: CvAgentChatPopupProps) 
     let newTop = dragStartRef.current.initialTop + dy;
     let newLeft = dragStartRef.current.initialLeft + dx;
 
-    // Boundary checks
     const dialogWidth = dialogContentRef.current.offsetWidth;
     const dialogHeight = dialogContentRef.current.offsetHeight;
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
-    // Prevent dragging outside viewport
     if (newLeft < 0) newLeft = 0;
     if (newTop < 0) newTop = 0;
     if (newLeft + dialogWidth > windowWidth) newLeft = windowWidth - dialogWidth;
@@ -163,7 +160,6 @@ export function CvAgentChatPopup({ open, onOpenChange }: CvAgentChatPopupProps) 
   }, [handleDialogMouseMove]);
 
   useEffect(() => {
-    // Cleanup global event listeners when component unmounts
     return () => {
       document.removeEventListener('mousemove', handleDialogMouseMove);
       document.removeEventListener('mouseup', handleDialogMouseUp);
@@ -194,42 +190,24 @@ export function CvAgentChatPopup({ open, onOpenChange }: CvAgentChatPopupProps) 
     };
     setMessages((prev) => [...prev, userMessage]);
 
-    try {
-      const input: AskCvGeneralAgentInput = { question: data.question }; // Use the general agent
-      const result: AskCvGeneralAgentOutput = await askCvGeneralAgent(input);
-      const aiMessage: ChatMessage = {
-        id: `ai-${Date.now()}`,
-        sender: 'ai',
-        text: result.answer || "Sorry, I couldn't get a response at this moment.",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, aiMessage]);
-    } catch (error) {
-      console.error('Error asking CV general agent:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to get an answer. Please try again.',
-        variant: 'destructive',
-      });
-      const errorMessageText = error instanceof Error ? error.message : 'An unexpected error occurred.';
-      const errorMessage: ChatMessage = {
-        id: `err-${Date.now()}`,
-        sender: 'ai',
-        text: `Sorry, I encountered an error: ${errorMessageText}. Please try again later.`,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-      setTimeout(() => {
-        clearErrors("question"); 
-        reset({ question: '' });    
-        clearErrors("question"); 
-        if (textAreaRef.current) {
-          textAreaRef.current.focus();
-        }
-      }, 0);
-    }
+    // AI functionality removed. Provide a standard response.
+    const aiMessage: ChatMessage = {
+      id: `ai-${Date.now()}`,
+      sender: 'ai',
+      text: "Sorry, the AI assistant is currently unavailable.",
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, aiMessage]);
+    
+    setIsLoading(false);
+    setTimeout(() => {
+      clearErrors("question"); 
+      reset({ question: '' });    
+      clearErrors("question"); 
+      if (textAreaRef.current) {
+        textAreaRef.current.focus();
+      }
+    }, 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -251,9 +229,8 @@ export function CvAgentChatPopup({ open, onOpenChange }: CvAgentChatPopupProps) 
       <DialogContent
         ref={dialogContentRef}
         className={cn(
-          "w-full max-w-[380px] h-[70vh] max-h-[580px]", // Default size if not dragged
-          "flex flex-col p-0 shadow-xl fixed z-50 rounded-lg border bg-card text-card-foreground", // Base styles
-          // Animation styles
+          "w-full max-w-[380px] h-[70vh] max-h-[580px]", 
+          "flex flex-col p-0 shadow-xl fixed z-50 rounded-lg border bg-card text-card-foreground", 
           "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95"
         )}
@@ -262,13 +239,12 @@ export function CvAgentChatPopup({ open, onOpenChange }: CvAgentChatPopupProps) 
           left: `${dialogPosition.left}px`,
           bottom: 'auto', 
           right: 'auto',  
-          transform: 'none', // Override centering transform when position is set
+          transform: 'none', 
         } : {
-           opacity: 0, // Initially hidden until position is calculated
+           opacity: 0, 
         }}
-        onOpenAutoFocus={(e) => e.preventDefault()} // Prevent auto-focus on first element
+        onOpenAutoFocus={(e) => e.preventDefault()} 
         onPointerDownOutside={(e) => { 
-          // Prevent closing if click is on the FAB
           const fab = document.querySelector('button[aria-label^="Open AI chat"], button[aria-label^="Close chat"]');
           if (fab && fab.contains(e.target as Node)) {
             e.preventDefault();
@@ -279,11 +255,10 @@ export function CvAgentChatPopup({ open, onOpenChange }: CvAgentChatPopupProps) 
           className="p-4 sm:p-5 pb-2 border-b shrink-0 relative cursor-grab active:cursor-grabbing"
           onMouseDown={handleDialogMouseDown}
         >
-          <DialogTitle className="flex items-center text-lg sm:text-xl font-semibold text-foreground pointer-events-none"> {/* Make title non-interactive for drag */}
+          <DialogTitle className="flex items-center text-lg sm:text-xl font-semibold text-foreground pointer-events-none"> 
             <Bot className="mr-2 h-6 w-6 text-accent" />
             AI Chat Assistant
           </DialogTitle>
-          {/* Close button is part of DialogContent by default, no need to add another here if using standard DialogClose */}
         </DialogHeader>
 
         <ScrollArea className="flex-grow p-4 sm:p-5" ref={scrollAreaRef}>
@@ -328,9 +303,9 @@ export function CvAgentChatPopup({ open, onOpenChange }: CvAgentChatPopupProps) 
                 )}
               </div>
             ))}
-             {isLoading && messages.length > 0 && messages[messages.length-1].sender === 'user' && ( // Show loader only if last message was user
+             {isLoading && messages.length > 0 && messages[messages.length-1].sender === 'user' && ( 
               <div className="flex items-start space-x-2.5 justify-start">
-                 <div className="flex-shrink-0 self-start p-1.5 bg-accent/10 rounded-full"> {/* AI icon for loader */}
+                 <div className="flex-shrink-0 self-start p-1.5 bg-accent/10 rounded-full"> 
                    <Bot className="h-5 w-5 text-accent" />
                 </div>
                 <div className="max-w-[75%] rounded-lg p-3 text-sm shadow-sm bg-card border text-foreground rounded-bl-none">
@@ -349,7 +324,7 @@ export function CvAgentChatPopup({ open, onOpenChange }: CvAgentChatPopupProps) 
                 {...register('question')}
                 ref={textAreaRef}
                 placeholder="Type your question..."
-                className="min-h-[50px] sm:min-h-[56px] resize-none bg-input text-input-foreground focus:ring-accent focus:border-accent text-sm sm:text-base pr-12" // Added pr for potential inline button space if needed
+                className="min-h-[50px] sm:min-h-[56px] resize-none bg-input text-input-foreground focus:ring-accent focus:border-accent text-sm sm:text-base pr-12" 
                 rows={1}
                 onKeyDown={handleKeyDown}
                 disabled={isLoading} 
@@ -372,3 +347,4 @@ export function CvAgentChatPopup({ open, onOpenChange }: CvAgentChatPopupProps) 
     </Dialog>
   );
 }
+
