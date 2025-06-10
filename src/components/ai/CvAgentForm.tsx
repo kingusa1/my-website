@@ -13,12 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Sparkles } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-// Import the new specific agent functions
-import { askCvMainAgent, type AskCvMainAgentInput, type AskCvMainAgentOutput } from '@/ai/flows/ask-cv-main-flow';
-import { askCvProjectsAgent, type AskCvProjectsAgentInput, type AskCvProjectsAgentOutput } from '@/ai/flows/ask-cv-projects-flow';
-import { askCvContactAgent, type AskCvContactAgentInput, type AskCvContactAgentOutput } from '@/ai/flows/ask-cv-contact-flow';
-import { askCvGeneralAgent, type AskCvGeneralAgentInput, type AskCvGeneralAgentOutput } from '@/ai/flows/ask-cv-general-flow';
-
+// AI Flow imports removed as the functionality is no longer used.
 
 const formSchema = z.object({
   question: z.string().min(5, 'Question must be at least 5 characters long.'),
@@ -47,46 +42,28 @@ export function CvAgentForm({ contextType = 'general' }: CvAgentFormProps) {
   const onSubmit: SubmitHandler<CvAgentFormData> = async (data) => {
     setIsLoading(true);
     setAiResponse(null);
-    try {
-      let result: AskCvMainAgentOutput | AskCvProjectsAgentOutput | AskCvContactAgentOutput | AskCvGeneralAgentOutput;
-      const agentInput = { question: data.question };
-
-      switch (contextType) {
-        case 'cvPage':
-          result = await askCvMainAgent(agentInput as AskCvMainAgentInput);
-          break;
-        case 'projectsPage':
-          result = await askCvProjectsAgent(agentInput as AskCvProjectsAgentInput);
-          break;
-        case 'contactPage':
-          result = await askCvContactAgent(agentInput as AskCvContactAgentInput);
-          break;
-        case 'general':
-        default:
-          result = await askCvGeneralAgent(agentInput as AskCvGeneralAgentInput);
-          break;
-      }
-      setAiResponse(result.answer);
-    } catch (error) {
-      console.error(`Error asking CV agent (context: ${contextType}):`, error);
-      toast({
-        title: 'Error',
-        description: 'Failed to get an answer. Please try again.',
-        variant: 'destructive',
-      });
-      setAiResponse(`An error occurred while trying to get an answer for context "${contextType}". Please try again.`);
-    } finally {
-      setIsLoading(false);
-    }
+    
+    // AI functionality removed. Provide a standard response.
+    const unavailableMessage = "Sorry, the AI assistant for this section is currently unavailable.";
+    setAiResponse(unavailableMessage);
+    toast({
+      title: 'AI Assistant Unavailable',
+      description: `The AI assistant for context "${contextType}" is not active.`,
+      variant: 'default', // Or 'destructive' if preferred for errors
+    });
+    
+    setIsLoading(false);
   };
 
   let descriptionText = "Have a question about my CV? Ask the AI assistant below. It uses my CV data (tailored to this section) as its knowledge base.";
   if (contextType === 'cvPage') {
-    descriptionText = "Ask about my summary, experience, education, or skills. For projects or contact info, please use the AI on those specific pages.";
+    descriptionText = "The AI assistant for this page is currently unavailable.";
   } else if (contextType === 'projectsPage') {
-    descriptionText = "Ask about my projects. For general CV details or contact info, please use the AI on those specific pages.";
+    descriptionText = "The AI assistant for this page is currently unavailable.";
   } else if (contextType === 'contactPage') {
-    descriptionText = "Ask about how to contact me. For CV details or projects, please use the AI on those specific pages.";
+    descriptionText = "The AI assistant for this page is currently unavailable.";
+  } else {
+    descriptionText = "The AI assistant is currently unavailable.";
   }
 
 
@@ -111,16 +88,17 @@ export function CvAgentForm({ contextType = 'general' }: CvAgentFormProps) {
                 placeholder="e.g., What was Mohamed's role at Soft Innovation?"
                 className="mt-1 min-h-[100px] bg-input text-input-foreground"
                 aria-invalid={errors.question ? "true" : "false"}
+                disabled={true} // Disable textarea since AI is unavailable
               />
               {errors.question && <p className="text-sm text-destructive mt-1">{errors.question.message}</p>}
             </div>
 
             <div className="flex space-x-4">
-              <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Button type="submit" disabled={isLoading || true} className="bg-primary hover:bg-primary/90 text-primary-foreground">
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                 Ask AI
               </Button>
-              <Button type="button" variant="outline" onClick={() => { reset(); setAiResponse(null); }} disabled={isLoading}>
+              <Button type="button" variant="outline" onClick={() => { reset(); setAiResponse(null); }} disabled={isLoading || true}>
                 Clear
               </Button>
             </div>
