@@ -1,10 +1,11 @@
+
 'use client';
 
 import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { rewriteResumeItem, type RewriteResumeItemInput } from '@/ai/flows/rewrite-resume-item';
+// Removed: import { rewriteResumeItem, type RewriteResumeItemInput } from '@/ai/flows/rewrite-resume-item';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -36,27 +37,16 @@ export function RewriteForm() {
   const onSubmit: SubmitHandler<RewriteFormData> = async (data) => {
     setIsLoading(true);
     setRewrittenItem(null);
-    try {
-      const input: RewriteResumeItemInput = {
-        resumeItem: data.resumeItem,
-        instructions: data.instructions,
-      };
-      const result = await rewriteResumeItem(input);
-      setRewrittenItem(result.rewrittenItem);
-      toast({
-        title: 'Success!',
-        description: 'Resume item rewritten successfully.',
-      });
-    } catch (error) {
-      console.error('Error rewriting resume item:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to rewrite resume item. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    
+    // AI functionality removed. Provide a standard response.
+    const unavailableMessage = "Sorry, the AI resume rewrite tool is currently unavailable.";
+    setRewrittenItem(unavailableMessage);
+    toast({
+      title: 'AI Tool Unavailable',
+      description: 'The AI resume rewrite functionality is not active.',
+    });
+    
+    setIsLoading(false);
   };
 
   return (
@@ -65,7 +55,7 @@ export function RewriteForm() {
         <CardHeader>
           <CardTitle className="text-2xl font-headline text-accent">AI Resume Rewrite Tool</CardTitle>
           <CardDescription>
-            Use AI to enhance your resume items. Provide the original text and instructions for rewriting.
+            This AI tool to enhance resume items is currently unavailable.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -78,6 +68,7 @@ export function RewriteForm() {
                 placeholder="e.g., Managed a team of developers."
                 className="mt-1 min-h-[100px] bg-input text-input-foreground"
                 aria-invalid={errors.resumeItem ? "true" : "false"}
+                disabled // Disable textarea as AI is unavailable
               />
               {errors.resumeItem && <p className="text-sm text-destructive mt-1">{errors.resumeItem.message}</p>}
             </div>
@@ -90,16 +81,17 @@ export function RewriteForm() {
                 placeholder="e.g., Make it sound more senior, rewrite to be more specific and detailed, or rewrite to be more brief."
                 className="mt-1 min-h-[100px] bg-input text-input-foreground"
                 aria-invalid={errors.instructions ? "true" : "false"}
+                disabled // Disable textarea as AI is unavailable
               />
               {errors.instructions && <p className="text-sm text-destructive mt-1">{errors.instructions.message}</p>}
             </div>
 
             <div className="flex space-x-4">
-              <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Button type="submit" disabled={isLoading || true} className="bg-primary hover:bg-primary/90 text-primary-foreground">
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Rewrite with AI
               </Button>
-              <Button type="button" variant="outline" onClick={() => { reset(); setRewrittenItem(null); }} disabled={isLoading}>
+              <Button type="button" variant="outline" onClick={() => { reset(); setRewrittenItem(null); }} disabled={isLoading || true}>
                 Clear
               </Button>
             </div>
