@@ -4,7 +4,7 @@ import type { CVData } from './types';
 export const cvData: CVData = {
   name: 'Mohamed Ismail',
   title: 'Software Tester and Software Engineer',
-  profilePhotoUrl: '/mohamed.jpg', // Ensure this points to the correct image in the public folder
+  profilePhotoUrl: '/my-website/mohamed.jpg', // Ensure this points to the correct image in the public folder
   contact: {
     phone: '(+20) 01144289394',
     email: 'mohamedhisham735@gmail.com',
